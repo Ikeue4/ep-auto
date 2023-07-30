@@ -2,7 +2,6 @@ import pytesseract
 from PIL import ImageGrab
 import pyautogui
 import time
-import keyboard
 import sys
 import os
 import matplotlib.pyplot as plt
