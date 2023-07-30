@@ -1,19 +1,17 @@
 
-artichoke
-eggplant; aubergine
-pumpkin; the pumpkin
-onion; the onion
-Brussels sprouts
-cabbage
-cauliflower; the cauliflower
-garlic; the garlic
-celery; the celery
-watercress
-broccoli
-zucchini
-mushroom
-asparagus
-pea; the pea
-corn
-turnip
-cucumber; the cucumber
+purple
+green
+brown
+blue
+yellow
+white
+black
+light
+colours; the colours; colors; the colors
+beige
+grey
+dark
+red
+pink
+lilac
+orange

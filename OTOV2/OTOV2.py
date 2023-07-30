@@ -7,6 +7,7 @@ import sys
 import os
 import matplotlib.pyplot as plt
 import matplotlib.image as mpimg
+from fuzzywuzzy import fuzz
 
 pytesseract.pytesseract.tesseract_cmd = r'C:\Program Files\Tesseract-OCR\tesseract.exe'
 
@@ -157,9 +158,10 @@ while True:
     elif main_menu_input == "2":
         language_list = []
         train()
-        while True:
+        time.sleep(2)
+        for i in range(20):
             to_type = ''
-            time.sleep(2)
+            time.sleep(0.1)
             # Get the coordinates of the region you want to capture
             # Replace these coordinates with the top-left and bottom-right coordinates of your desired region
             x1, y1 = 300, 720  # Top-left corner
@@ -202,22 +204,23 @@ while True:
                 
             if recognized_text == 'ice cream, ice-cream':
                 sys.exit
-            
 
             for i in language_list:
-                if i[0] == result.lower():
+                if fuzz.partial_ratio(i[0], result.lower()) >= 97:
                     print("recognized text")
                     print(i[1])
                     to_type=i[1]
                     
-            pyautogui.moveTo(1650, 1400, duration=1)
+            pyautogui.moveTo(1650, 1400, duration=0.1)
 
             pyautogui.click()
 
-            pyautogui.typewrite(to_type, interval=0.1)
-            
+            pyautogui.typewrite(to_type, interval=0.01)
+                    
+            if to_type == '':
+                pyautogui.typewrite('?', interval=0.01)
+                pyautogui.press('enter')
 
             # Simulate pressing the "Enter" key
             pyautogui.press('enter')
             
-
