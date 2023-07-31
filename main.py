@@ -1,93 +1,75 @@
-import pytesseract
-from PIL import ImageGrab
-import pyautogui
-import time
-import keyboard
+import subprocess
 import sys
-time.sleep(2)
+import time
+def clear_terminal():
+    print("\n")
+    #os.system("cls")
 
-while True:
-    
-    to_type='el helado'
-
-    time.sleep(2)
-
-    language_list = [["la fruta", "fruit"],['la leche', "milk"],['el pan', 'bread'],["el pastel", "cake"],
-    ["el queso", "cheese"],
-    ["las patatas fritas", "chips"],
-    ["las verduras", "vegetables"],
-    ["el chocolate", "chocolate"],
-    ["el pescado", "fish"],
-    ["el pollo", "the chicken"],
-    ["me gusta", "i like it"],
-    ["el helado", "ice cream"],
-    ["no me gusta", "i don't like it"],
-    ["las galletas", "biscuits"],
-    ["el arroz", "rice"],
-    ["me gusta", "| like it"],
-    ["no me gusta", "| don't like it"],
-    ]
-
-    # Set the path to the Tesseract executable
-    pytesseract.pytesseract.tesseract_cmd = r'C:\Program Files\Tesseract-OCR\tesseract.exe'
-
-    # Get the coordinates of the region you want to capture
-    # Replace these coordinates with the top-left and bottom-right coordinates of your desired region
-    x1, y1 = 300, 720  # Top-left corner
-    x2, y2 = 2500, 1000  # Bottom-right corner
-
-    # Get the screen size
-    screen_width, screen_height = pyautogui.size()
-
-    # Ensure coordinates are within the screen boundaries
-    x1 = max(0, min(x1, screen_width - 1))
-    y1 = max(0, min(y1, screen_height - 1))
-    x2 = max(0, min(x2, screen_width - 1))
-    y2 = max(0, min(y2, screen_height - 1))
-
-    # Capture the screenshot of the specified region
-    screenshot = pyautogui.screenshot(region=(x1, y1, x2 - x1, y2 - y1))
-
-    # Save the screenshot to a file (optional)
-    screenshot.save("screenshot.png")
-
-    # Step 3: Capture the screenshot
-    screenshot = 'screenshot.png'#ImageGrab.grab()
+def print_progress_bar(iteration, total, prefix='', suffix='', length=50, fill='█', end='\r'):
+    percent = ("{0:.1f}").format(100 * (iteration / float(total)))
+    filled_length = int(length * iteration // total)
+    bar = fill * filled_length + '-' * (length - filled_length)
+    sys.stdout.write(f'\r{prefix} |{bar}| {percent}% {suffix}'),
+    sys.stdout.flush()
+    if iteration == total:
+        print()
 
 
-    # Step 4: Preprocess the screenshot (optional)
+def install_library(library_name):
+    try:
+        # Use pip to install the library
+        subprocess.run(["pip", "install", library_name], check=True)
+        print(f"{library_name} installed successfully.")
+    except subprocess.CalledProcessError:
+        print(f"Error occurred while installing {library_name}.")
 
-    # Step 5: Perform text recognition
-    recognized_text = pytesseract.image_to_string(screenshot)
-
-    # Print the recognized text
-    print(recognized_text)
-    recognized_text = recognized_text.rstrip()
-    
-    if "," in recognized_text:
-        parts = recognized_text.split(",", 1)
-        result = parts[0]
-        
-    else:
-        result = recognized_text
-        
-    if recognized_text == 'ice cream, ice-cream':
-        sys.exit
-    
-
-    for i in language_list:
-        if i[1] == result.lower():
-            print("recognized text")
-            print(i[0])
-            to_type=i[0]
-            
-    pyautogui.moveTo(1650, 1400, duration=1)
-
-    pyautogui.click()
-
-    pyautogui.typewrite(to_type, interval=0.1)
-    
-
-    # Simulate pressing the "Enter" key
-    pyautogui.press('enter')
-
+if __name__ == "__main__":
+    # Example usage:
+    total_iterations = 20
+    for i in range(total_iterations + 1):
+        time.sleep(0.1)  # Simulate some work being done
+        print_progress_bar(i, total_iterations, prefix='Progress:', suffix='Complete', length=50)
+    library_name = "numpy"  # Replace "numpy" with the name of the library you want to install
+    install_library(library_name)
+    clear_terminal()
+    total_iterations = 20
+    for i in range(total_iterations + 1):
+        time.sleep(0.1)  # Simulate some work being done
+        print_progress_bar(i, total_iterations, prefix='Progress:', suffix='Complete', length=50)
+    library_name = "pytesseract"
+    install_library(library_name)
+    clear_terminal()
+    total_iterations = 20
+    for i in range(total_iterations + 1):
+        time.sleep(0.1)  # Simulate some work being done
+        print_progress_bar(i, total_iterations, prefix='Progress:', suffix='Complete', length=50)
+    library_name = "Pillow"
+    install_library(library_name)
+    clear_terminal()
+    total_iterations = 20
+    for i in range(total_iterations + 1):
+        time.sleep(0.1)  # Simulate some work being done
+        print_progress_bar(i, total_iterations, prefix='Progress:', suffix='Complete', length=50)
+    library_name = "PyAutoGUI"
+    install_library(library_name)
+    clear_terminal()
+    total_iterations = 20
+    for i in range(total_iterations + 1):
+        time.sleep(0.1)  # Simulate some work being done
+        print_progress_bar(i, total_iterations, prefix='Progress:', suffix='Complete', length=50)
+    library_name = "time"
+    install_library(library_name)
+    clear_terminal()
+    total_iterations = 20
+    for i in range(total_iterations + 1):
+        time.sleep(0.1)  # Simulate some work being done
+        print_progress_bar(i, total_iterations, prefix='Progress:', suffix='Complete', length=50)
+    library_name = "matplotlib"
+    install_library(library_name)
+    clear_terminal()
+    total_iterations = 20
+    for i in range(total_iterations + 1):
+        time.sleep(0.1)  # Simulate some work being done
+        print_progress_bar(i, total_iterations, prefix='Progress:', suffix='Complete', length=50)
+    library_name = "fuzzywuzzy"
+    install_library(library_name)

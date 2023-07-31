@@ -7,14 +7,22 @@ import os
 import matplotlib.pyplot as plt
 import matplotlib.image as mpimg
 from fuzzywuzzy import fuzz
-
-pytesseract.pytesseract.tesseract_cmd = r'C:\Program Files\Tesseract-OCR\tesseract.exe'
+import threading
 
 x1 = 0
 y1 = 0
 x2 = 0
 y2 = 0
 clicks = 0
+
+def print_progress_bar(iteration, total, prefix='', suffix='', length=50, fill='█', end='\r'):
+    percent = ("{0:.1f}").format(100 * (iteration / float(total)))
+    filled_length = int(length * iteration // total)
+    bar = fill * filled_length + '-' * (length - filled_length)
+    sys.stdout.write(f'\r{prefix} |{bar}| {percent}% {suffix}'),
+    sys.stdout.flush()
+    if iteration == total:
+        print()
 
 # Function to handle mouse click event
 def onclick(event):
@@ -61,9 +69,10 @@ def screenshot_with_new(x1, y1, x2, y2):
     
 def train_data_out_other():
     language = []
+    file = input("language list file name(spanish file) = ")
     recognized_text = pytesseract.image_to_string('screenshot.png')
     lines_list = [line for line in recognized_text.splitlines() if line.strip()]
-    f = open('OTOV2_learn_other.txt', 'a')
+    f = open(file + '.txt', 'w')
     
     for i in lines_list:
         f.write("\n")
@@ -71,10 +80,11 @@ def train_data_out_other():
     f.close()
     
 def train_data_out_english():
+    file = input("language list file name(english file) = ")
     language = []
     recognized_text = pytesseract.image_to_string('screenshot.png')
     lines_list = [line for line in recognized_text.splitlines() if line.strip()]
-    f = open('OTOV2\OTOV2_learn_english.txt', 'a')
+    f = open(file + '.txt', 'w')
     
     for i in lines_list:
         f.write("\n")
@@ -84,7 +94,8 @@ def train_data_out_english():
 
 def train():
     global language_list
-    f = open('OTOV2_learn_other.txt', 'r')
+    file = input("language list file(spanish file) = ")
+    f = open(file + '.txt', 'r')
     spanish = []
     for l in f:
         if ";" in l:
@@ -96,8 +107,9 @@ def train():
             
         spanish.append(l)
     f.close()
-        
-    f = open('OTOV2\OTOV2_learn_english.txt', 'r')
+    
+    file = input("language list file(english file) = ")
+    f = open(file + '.txt', 'r')
     english = []
     for l in f:
         if ";" in l:
@@ -124,9 +136,28 @@ def train():
         
     for i in language_list:
         print(i)
-        
+
+def t1():
+    total_iterations = 10
+    for i in range(total_iterations + 1):
+        time.sleep(0.01)  # Simulate some work being done
+        print_progress_bar(i, total_iterations, prefix='Progress:', suffix='Complete', length=50)
+
+def t2():
+    pytesseract.pytesseract.tesseract_cmd = r'C:\Program Files\Tesseract-OCR\tesseract.exe'
+    
+thread1 = threading.Thread(target=t1)
+thread2 = threading.Thread(target=t2)
+
+thread1.start()
+thread2.start()
+
+thread1.join()
+thread1.join()
+    
+    
 while True:
-    print("1. train\n2. test")
+    print("1. Train\n2. Test\n3. Load")
     main_menu_input = input()
     clear_terminal()
     
@@ -152,15 +183,14 @@ while True:
         screenshot_with_new(x1, y1, x2, y2)
         train_data_out_english()
         language_list = []
-        train()
         
     elif main_menu_input == "2":
         language_list = []
         train()
         time.sleep(2)
-        for i in range(20):
+        for i in range(200):
             to_type = ''
-            time.sleep(0.1)
+            #time.sleep(0.05)
             # Get the coordinates of the region you want to capture
             # Replace these coordinates with the top-left and bottom-right coordinates of your desired region
             x1, y1 = 300, 720  # Top-left corner
@@ -205,12 +235,12 @@ while True:
                 sys.exit
 
             for i in language_list:
-                if fuzz.partial_ratio(i[0], result.lower()) >= 97:
+                if fuzz.partial_ratio(i[1], result.lower()) >= 97:
                     print("recognized text")
-                    print(i[1])
-                    to_type=i[1]
+                    print(i[0])
+                    to_type=i[0]
                     
-            pyautogui.moveTo(1650, 1400, duration=0.1)
+            pyautogui.moveTo(1650, 1400, duration=0.01)
 
             pyautogui.click()
 
