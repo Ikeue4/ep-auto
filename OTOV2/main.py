@@ -73,3 +73,10 @@ if __name__ == "__main__":
         print_progress_bar(i, total_iterations, prefix='Progress:', suffix='Complete', length=50)
     library_name = "fuzzywuzzy"
     install_library(library_name)
+    clear_terminal()
+    total_iterations = 20
+    for i in range(total_iterations + 1):
+        time.sleep(0.1)  # Simulate some work being done
+        print_progress_bar(i, total_iterations, prefix='Progress:', suffix='Complete', length=50)
+    library_name = "opencv-python"
+    install_library(library_name)

@@ -6,14 +6,174 @@ import sys
 import os
 import matplotlib.pyplot as plt
 import matplotlib.image as mpimg
-from fuzzywuzzy import fuzz
+import Levenshtein
 import threading
+import configparser
+import cv2
+import numpy as np
+import psutil
 
+config = configparser.ConfigParser()
+config.read('config.ini')
 x1 = 0
 y1 = 0
 x2 = 0
 y2 = 0
 clicks = 0
+spanish = []
+english = []
+stop = False
+error = False
+
+def generate_image():
+    screenshot = pyautogui.screenshot()
+    screenshot.save("screenshot_scan.png")
+    
+def num3():
+    def clear_terminal():
+        os.system('cls' if os.name == 'nt' else 'clear')
+
+    def get_system_load():
+        cpu_load = psutil.cpu_percent()
+        gpu_load = 0  # Add code here to get GPU load if available
+        ram_load = psutil.virtual_memory().percent
+        return cpu_load, gpu_load, ram_load
+
+    def display_system_load(cpu_load, gpu_load, ram_load):
+        print(f"CPU Load: {cpu_load}%")
+        print(f"GPU Load: {gpu_load}%")
+        print(f"RAM Load: {ram_load}%")
+
+    def main():
+        while not stop_flag:
+            clear_terminal()
+            cpu_load, gpu_load, ram_load = get_system_load()
+            display_system_load(cpu_load, gpu_load, ram_load)
+            time.sleep(1)
+
+    if __name__ == '__main__':
+        main()
+
+def process_template(template_file):
+    global stop
+    
+    confidence_threshold = 30
+    # Load the target image
+    target = cv2.imread('screenshot_scan.png', 0)
+
+    # Create a SIFT object
+    sift = cv2.SIFT_create()
+
+    # Load the template image
+    template = cv2.imread(template_file, 0)
+
+    # Detect and compute keypoints and descriptors for the template and target images
+    keypoints_template, descriptors_template = sift.detectAndCompute(template, None)
+    keypoints_target, descriptors_target = sift.detectAndCompute(target, None)
+
+    # Create a brute-force matcher
+    bf = cv2.BFMatcher()
+
+    # Match descriptors between the template and target images
+    matches = bf.match(descriptors_template, descriptors_target)
+
+    # Sort the matches by distance (lower distance means better match)
+    matches = sorted(matches, key=lambda x: x.distance)
+
+    # Select reliable matches using RANSAC
+    src_pts = np.float32([keypoints_template[m.queryIdx].pt for m in matches]).reshape(-1, 1, 2)
+    dst_pts = np.float32([keypoints_target[m.trainIdx].pt for m in matches]).reshape(-1, 1, 2)
+    homography, mask = cv2.findHomography(src_pts, dst_pts, cv2.RANSAC, 5.0)
+
+    # Calculate the number of inliers
+    num_inliers = np.sum(mask)
+
+    # Calculate the percentage of inliers
+    confidence = (num_inliers / len(matches)) * 100
+    #print(confidence)
+    if confidence >= confidence_threshold:
+        #print('success')
+        # Draw bounding box around the template in the target image
+        h, w = template.shape
+        corners = np.float32([[0, 0], [0, h], [w, h], [w, 0]]).reshape(-1, 1, 2)
+        corners_transformed = cv2.perspectiveTransform(corners, homography)
+        target_with_box = cv2.polylines(target, [np.int32(corners_transformed)], True, (0, 255, 0), 3)
+        
+        island_center_x = int(np.mean(corners_transformed[:, :, 0]))
+        island_center_y = int(np.mean(corners_transformed[:, :, 1]))
+        
+        # Display the target image with the bounding box
+        #cv2.imshow("Target Image with Bounding Box", target_with_box)
+        cv2.waitKey(0)
+        stop = True
+
+def process_template_error(template_file):
+    global error
+    
+    img_path = 'screenshot_scan.png'
+    img = mpimg.imread(img_path)
+    confidence_threshold = 30
+    # Load the target image
+    target = cv2.imread('screenshot_scan.png', 0)
+
+    # Create a SIFT object
+    sift = cv2.SIFT_create()
+
+    # Load the template image
+    template = cv2.imread(template_file, 0)
+
+    # Detect and compute keypoints and descriptors for the template and target images
+    keypoints_template, descriptors_template = sift.detectAndCompute(template, None)
+    keypoints_target, descriptors_target = sift.detectAndCompute(target, None)
+
+    # Create a brute-force matcher
+    bf = cv2.BFMatcher()
+
+    # Match descriptors between the template and target images
+    matches = bf.match(descriptors_template, descriptors_target)
+
+    # Sort the matches by distance (lower distance means better match)
+    matches = sorted(matches, key=lambda x: x.distance)
+
+    # Select reliable matches using RANSAC
+    src_pts = np.float32([keypoints_template[m.queryIdx].pt for m in matches]).reshape(-1, 1, 2)
+    dst_pts = np.float32([keypoints_target[m.trainIdx].pt for m in matches]).reshape(-1, 1, 2)
+    homography, mask = cv2.findHomography(src_pts, dst_pts, cv2.RANSAC, 5.0)
+
+    # Calculate the number of inliers
+    num_inliers = np.sum(mask)
+
+    # Calculate the percentage of inliers
+    confidence = (num_inliers / len(matches)) * 100
+    #print(confidence)
+    if confidence >= confidence_threshold:
+        #print('success')
+        # Draw bounding box around the template in the target image
+        h, w = template.shape
+        corners = np.float32([[0, 0], [0, h], [w, h], [w, 0]]).reshape(-1, 1, 2)
+        corners_transformed = cv2.perspectiveTransform(corners, homography)
+        target_with_box = cv2.polylines(target, [np.int32(corners_transformed)], True, (0, 255, 0), 3)
+        
+        island_center_x = int(np.mean(corners_transformed[:, :, 0]))
+        island_center_y = int(np.mean(corners_transformed[:, :, 1]))
+        
+        # Display the target image with the bounding box
+        #cv2.imshow("Target Image with Bounding Box", target_with_box)
+        cv2.waitKey(0)
+        error = True
+
+
+def find_closest_match(target_word, word_list):
+    closest_match = None
+    min_distance = float('inf')
+
+    for word in word_list:
+        distance = Levenshtein.distance(target_word, word)
+        if distance < min_distance:
+            min_distance = distance
+            closest_match = word
+
+    return closest_match
 
 def print_progress_bar(iteration, total, prefix='', suffix='', length=50, fill='█', end='\r'):
     percent = ("{0:.1f}").format(100 * (iteration / float(total)))
@@ -77,6 +237,7 @@ def train_data_out_other():
     for i in lines_list:
         f.write("\n")
         f.write(i)
+        print(i)
     f.close()
     
 def train_data_out_english():
@@ -89,11 +250,14 @@ def train_data_out_english():
     for i in lines_list:
         f.write("\n")
         f.write(i)
+        print(i)
     f.close()
 
 
 def train():
     global language_list
+    global spanish
+    global english
     file = input("language list file(spanish file) = ")
     f = open(file + '.txt', 'r')
     spanish = []
@@ -155,9 +319,10 @@ thread2.start()
 thread1.join()
 thread1.join()
     
-    
+
 while True:
-    print("1. Train\n2. Test\n3. Load")
+    clear_terminal()
+    print("1. Train\n2. Test\n3. Settings\n4. quit...")
     main_menu_input = input()
     clear_terminal()
     
@@ -185,71 +350,177 @@ while True:
         language_list = []
         
     elif main_menu_input == "2":
+        clear_terminal()
+        read_write = input('R for Read, W for Write: ')
         language_list = []
         train()
         time.sleep(2)
-        for i in range(200):
-            to_type = ''
-            #time.sleep(0.05)
-            # Get the coordinates of the region you want to capture
-            # Replace these coordinates with the top-left and bottom-right coordinates of your desired region
-            x1, y1 = 300, 720  # Top-left corner
-            x2, y2 = 2500, 1000  # Bottom-right corner
-
-            # Get the screen size
-            screen_width, screen_height = pyautogui.size()
-
-            # Ensure coordinates are within the screen boundaries
-            x1 = max(0, min(x1, screen_width - 1))
-            y1 = max(0, min(y1, screen_height - 1))
-            x2 = max(0, min(x2, screen_width - 1))
-            y2 = max(0, min(y2, screen_height - 1))
-
-            # Capture the screenshot of the specified region
-            screenshot = pyautogui.screenshot(region=(x1, y1, x2 - x1, y2 - y1))
-
-            # Save the screenshot to a file (optional)
-            screenshot.save("screenshot.png")
-
-            # Step 3: Capture the screenshot
-            screenshot = 'screenshot.png'#ImageGrab.grab()
-
-
-            # Step 4: Preprocess the screenshot (optional)
-
-            # Step 5: Perform text recognition
-            recognized_text = pytesseract.image_to_string(screenshot)
-
-            # Print the recognized text
-            print(recognized_text)
-            recognized_text = recognized_text.rstrip()
+        time_delay = float(input('time delay(for dash, for normal do 0): '))
+        stop = False
+        errors = 0
+        stop_flag = False
+        times = int(input('how many times: '))
+        #checking = input('would you like error checking(uses cpu resources!)(Y/N): ')
+        thread1 = threading.Thread(target=num3)
+        thread1.start()
+        for i in range(times):
+            error = False
             
-            if "," in recognized_text:
-                parts = recognized_text.split(",", 1)
-                result = parts[0]
-                
-            else:
-                result = recognized_text
-                
-            if recognized_text == 'ice cream, ice-cream':
-                sys.exit
+            generate_image()
+            
+            template_file1 = 'C:\GitHub\ep-auto\error_windows\Web capture_3-8-2023_183936_app.educationperfect.com.jpeg'
+            template_file2 = 'C:\GitHub\ep-auto\error_windows\Web capture_3-8-2023_17436_app.educationperfect.com.jpeg'
+            template_file3 = 'C:\GitHub\ep-auto\error_windows\Web capture_3-8-2023_1979_app.educationperfect.com.jpeg'
+            
+            thread2 = threading.Thread(target=process_template, args=(template_file1,))
+            thread3 = threading.Thread(target=process_template_error, args=(template_file2,))
+            thread4 = threading.Thread(target=process_template, args=(template_file3,))
+            
+            thread2.start()
+            thread3.start()
+            thread4.start()
+            
+            thread2.join()
+            thread3.join()
+            thread4.join()
+            
+            if stop == True:
+                break
+            if error == True:
+                errors += 1
+            
+            time.sleep(time_delay)
+            to_type = ''
+            
+            if error == False:
+                #time.sleep(0.05)
+                # Get the coordinates of the region you want to capture
+                # Replace these coordinates with the top-left and bottom-right coordinates of your desired region
+                x1 = config.get('screenshot', 'x1')
+                x2 = config.get('screenshot', 'x2')
+                y1 = config.get('screenshot', 'y1')
+                y2 = config.get('screenshot', 'y2')
 
-            for i in language_list:
-                if fuzz.partial_ratio(i[1], result.lower()) >= 97:
-                    print("recognized text")
-                    print(i[0])
-                    to_type=i[0]
+                    # Get the screen size
+                screen_width, screen_height = pyautogui.size()
+
+                # Ensure coordinates are within the screen boundaries
+                x1 = max(0, min(float(x1), screen_width - 1))
+                y1 = max(0, min(float(y1), screen_height - 1))
+                x2 = max(0, min(float(x2), screen_width - 1))
+                y2 = max(0, min(float(y2), screen_height - 1))
+
+                # Capture the screenshot of the specified region
+                screenshot = pyautogui.screenshot(region=(x1, y1, x2 - x1, y2 - y1))
+
+                # Save the screenshot to a file (optional)
+                screenshot.save("screenshot.png")
+
+                    # Step 3: Capture the screenshot
+                screenshot = 'screenshot.png'#ImageGrab.grab()
+
+
+                # Step 4: Preprocess the screenshot (optional)
+
+                # Step 5: Perform text recognition
+                recognized_text = pytesseract.image_to_string(screenshot)
+
+                # Print the recognized text
+                #print(recognized_text)
+                recognized_text = recognized_text.rstrip()
                     
-            pyautogui.moveTo(1650, 1400, duration=0.01)
-
-            pyautogui.click()
-
-            pyautogui.typewrite(to_type, interval=0.01)
+                if "," in recognized_text:
+                    parts = recognized_text.split(",", 1)
+                    result = parts[0]
+                        
+                else:
+                    result = recognized_text
+                        
+                if recognized_text == 'ice cream, ice-cream':
+                    sys.exit
                     
-            if to_type == '':
-                pyautogui.typewrite('?', interval=0.01)
+                if read_write.lower() == 'r':
+                    closest_word = find_closest_match(result.lower(), spanish)
+                    #print("Closest match for '{}' is '{}'.".format(result, closest_word))
+                    i = spanish.index(closest_word)
+                    i -= 1
+                    x = language_list[i]
+                    #print(x[1])
+                    to_type = x[1]
+                        
+                elif read_write.lower() == 'w':
+                    closest_word = find_closest_match(result.lower(), english)
+                    #print("Closest match for '{}' is '{}'.".format(result, closest_word))
+                    i = english.index(closest_word)
+                    i -= 1
+                    x = language_list[i]
+                    #print(x[0])
+                    to_type = x[0]
+
+                            
+                pyautogui.moveTo(float(config.get('cerse', 'x')),float(config.get('cerse', 'y')), duration=0.01)
+
+                pyautogui.click()
+
+                pyautogui.typewrite(to_type, interval=0.01)
+                            
+                if to_type == '':
+                    pyautogui.typewrite('?', interval=0.01)
+                    pyautogui.press('enter')
+
+                # Simulate pressing the "Enter" key
                 pyautogui.press('enter')
-
-            # Simulate pressing the "Enter" key
-            pyautogui.press('enter')
+            else:
+                time.sleep(2)
+                pyautogui.press('enter')
+        stop_flag = True
+        clear_terminal()
+        
+    elif main_menu_input == '3':
+        clear_terminal()
+        print('1. screenshot scan area calibration\n2. cerise scan area calibration\n')
+        settings_menu_input = input("")
+        if settings_menu_input == "1":
+            clear_terminal()
+            x1 = config.get('screenshot', 'x1')
+            x2 = config.get('screenshot', 'x2')
+            y1 = config.get('screenshot', 'y1')
+            y2 = config.get('screenshot', 'y2')
+            print('From left corner:', x1, y1,"\nFrom right corner:", x2, y2)
+            change = input("change values(Y/N): ")
+            if change.lower() == 'y':
+                print('tab to ep!!!!!')
+                time.sleep(2)
+                clicks = 0
+                screenshot_position()
+                config.set('screenshot', 'x1', str(x1))
+                config.set('screenshot', 'x2', str(x2))
+                config.set('screenshot', 'y1', str(y1))
+                config.set('screenshot', 'y2', str(y2))
+                print('you are changing your screen scan to:', x1, y1, x2, y2, "Y/N")
+                conferm = input('')
+                if conferm.lower() == 'y':
+                    with open('config.ini', 'w') as configfile:
+                        config.write(configfile)
+        elif settings_menu_input == "2":
+            clear_terminal()
+            x2 = config.get('cerse', 'x')
+            y2 = config.get('cerse', 'y')
+            change = input("do you want to change the cerse position? (Y/N): ")
+            if change.lower() == 'y':
+                print('tab to ep!!!!')
+                time.sleep(2)
+                clicks = 1
+                screenshot_position()
+                config.set('cerse', 'x', str(x2))
+                config.set('cerse', 'y', str(y2))
+                print('are you sure you want to change the cerse position? (Y/N): ')
+                conferm = input()
+                if conferm.lower() == 'y':
+                    with open('config.ini', 'w') as configfile:
+                        config.write(configfile)
+    
+    elif main_menu_input == '4':
+        clear_terminal()
+        sys.exit()
             
