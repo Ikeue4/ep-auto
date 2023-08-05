@@ -234,7 +234,7 @@ def train_data_out_other():
     file = input("language list file name(spanish file) = ")
     recognized_text = pytesseract.image_to_string('screenshot.png')
     lines_list = [line for line in recognized_text.splitlines() if line.strip()]
-    f = open('trained_models/' + file + '.txt', 'w')
+    f = open('trained_models_OTOV2/' + file + '.txt', 'w')
     
     for i in lines_list:
         f.write("\n")
@@ -247,7 +247,7 @@ def train_data_out_english():
     language = []
     recognized_text = pytesseract.image_to_string('screenshot.png')
     lines_list = [line for line in recognized_text.splitlines() if line.strip()]
-    f = open('trained_models/' + file + '.txt', 'w')
+    f = open('trained_models_OTOV2/' + file + '.txt', 'w')
     
     for i in lines_list:
         f.write("\n")
@@ -261,7 +261,7 @@ def train():
     global spanish
     global english
     file = input("language list file(spanish file) = ")
-    f = open('trained_models/' + file + '.txt', 'r')
+    f = open('trained_models_OTOV2/' + file + '.txt', 'r')
     spanish = []
     for l in f:
         if ";" in l:
@@ -275,7 +275,7 @@ def train():
     f.close()
     
     file = input("language list file(english file) = ")
-    f = open('trained_models/' + file + '.txt', 'r')
+    f = open('trained_models_OTOV2/' + file + '.txt', 'r')
     english = []
     for l in f:
         if ";" in l:

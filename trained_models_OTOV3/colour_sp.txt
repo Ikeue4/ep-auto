@@ -1,0 +1,17 @@
+
+morado; morada
+verde; verdes
+marrón; marrones
+azul; azules
+amarillo; amarilla; amarillos; amarillas
+blanco; blanca; blancos; blancas
+negro; negra; negros; negras
+claro; clara; claros; claras
+los colores
+beige
+gris; grises
+oscuro; oscura
+rojo; roja; rojos; rojas
+rosa; rosas
+lila
+naranja

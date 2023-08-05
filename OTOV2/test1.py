@@ -1,12 +1,28 @@
+import pytesseract
+from PIL import ImageGrab
+import pyautogui
+import time
+import sys
+import os
+import matplotlib.pyplot as plt
+import matplotlib.image as mpimg
+import Levenshtein
+import threading
+import configparser
 import cv2
 import numpy as np
-import time
+import psutil
+import pyperclip
+
+def generate_image():
+    screenshot = pyautogui.screenshot()
+    screenshot.save("screenshot_scan_test.png")
 
 def process_template(template_file):
     
     confidence_threshold = 8
     # Load the target image
-    target = cv2.imread('Web capture_4-8-2023_215637_app.educationperfect.com.jpeg', 0)
+    target = cv2.imread('error_windows\Web capture_3-8-2023_183936_app.educationperfect.com.jpeg', 0)
 
     # Create a SIFT object
     sift = cv2.SIFT_create()
@@ -52,11 +68,14 @@ def process_template(template_file):
         print(island_center_x)
         print(island_center_y)
         
+        pyautogui.moveTo(island_center_x, island_center_y, duration=0.01)
+        
         # Display the target image with the bounding box
         cv2.imshow("Target Image with Bounding Box", target_with_box)
         cv2.waitKey(0)
-        
-process_template('error_windows\Web capture_4-8-2023_221021_app.educationperfect.com.jpeg')
+
+#generate_image()
+process_template('error_windows\complet_unlocked.jpeg')
 
 
         

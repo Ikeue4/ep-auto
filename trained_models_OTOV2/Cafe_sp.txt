@@ -1,0 +1,13 @@
+
+?1Algo ma1s?
+!1Buen provecho!
+!1Que1 rico!; Qu� rico
+La cuenta, por favor.
+?1Para beber?
+?1Para comer? 
+?1Que1 vas a tomar?
+!1Aqui1 esta1!
+De primer plato, quiero X.
+De postre, quiero X.
+Para beber, quiero X.
+Gracias.
