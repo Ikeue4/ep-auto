@@ -1,0 +1,23 @@
+
+rice; the rice
+strawberry; the strawberry
+lemon; the lemon
+apple; the apple
+peach; the peach
+melon; the melon
+orange; the orange
+bread; the bread
+pear; the pear
+pineapple; the pineapple
+grape; the grape
+peanut; the peanut
+avocado; the avocado
+banana; the banana
+raspberry
+plum
+food; the food
+fruits
+kiwi
+lime
+olive
+tangerine

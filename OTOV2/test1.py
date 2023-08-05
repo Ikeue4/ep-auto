@@ -1,19 +1,12 @@
 import cv2
 import numpy as np
-import pyautogui
-import matplotlib.image as mpimg
-import time 
+import time
 
 def process_template(template_file):
-    time.sleep(1)
-    screenshot = pyautogui.screenshot()
-    screenshot.save("screenshot_scan.png")
     
-    img_path = 'screenshot_scan.png'
-    img = mpimg.imread(img_path)
-    confidence_threshold = 30
+    confidence_threshold = 8
     # Load the target image
-    target = cv2.imread('screenshot_scan.png', 0)
+    target = cv2.imread('Web capture_4-8-2023_215637_app.educationperfect.com.jpeg', 0)
 
     # Create a SIFT object
     sift = cv2.SIFT_create()
@@ -44,11 +37,9 @@ def process_template(template_file):
 
     # Calculate the percentage of inliers
     confidence = (num_inliers / len(matches)) * 100
-    #print('checking confidence')
-    #print(confidence, template_file)
     print(confidence)
     if confidence >= confidence_threshold:
-        print('success')
+        #print('success')
         # Draw bounding box around the template in the target image
         h, w = template.shape
         corners = np.float32([[0, 0], [0, h], [w, h], [w, 0]]).reshape(-1, 1, 2)
@@ -58,10 +49,14 @@ def process_template(template_file):
         island_center_x = int(np.mean(corners_transformed[:, :, 0]))
         island_center_y = int(np.mean(corners_transformed[:, :, 1]))
         
+        print(island_center_x)
+        print(island_center_y)
+        
         # Display the target image with the bounding box
-        #cv2.imshow("Target Image with Bounding Box", target_with_box)
+        cv2.imshow("Target Image with Bounding Box", target_with_box)
         cv2.waitKey(0)
+        
+process_template('error_windows\Web capture_4-8-2023_221021_app.educationperfect.com.jpeg')
 
-while True:
-    process_template('C:\GitHub\ep-auto\error_windows\Web capture_3-8-2023_183936_app.educationperfect.com.jpeg')
-    process_template('C:\GitHub\ep-auto\error_windows\Web capture_3-8-2023_17436_app.educationperfect.com.jpeg')
+
+        

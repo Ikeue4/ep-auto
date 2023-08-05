@@ -12,6 +12,7 @@ import configparser
 import cv2
 import numpy as np
 import psutil
+import pyperclip
 
 config = configparser.ConfigParser()
 config.read('config.ini')
@@ -57,7 +58,7 @@ def num3():
 def process_template(template_file):
     global stop
     
-    confidence_threshold = 30
+    confidence_threshold = 8
     # Load the target image
     target = cv2.imread('screenshot_scan.png', 0)
 
@@ -90,7 +91,7 @@ def process_template(template_file):
 
     # Calculate the percentage of inliers
     confidence = (num_inliers / len(matches)) * 100
-    #print(confidence)
+    print(confidence)
     if confidence >= confidence_threshold:
         #print('success')
         # Draw bounding box around the template in the target image
@@ -106,13 +107,14 @@ def process_template(template_file):
         #cv2.imshow("Target Image with Bounding Box", target_with_box)
         cv2.waitKey(0)
         stop = True
+        print("awdddddddddddddddddddddddddddddddddd\nwdasssssssssssssssssss")
 
 def process_template_error(template_file):
     global error
     
     img_path = 'screenshot_scan.png'
     img = mpimg.imread(img_path)
-    confidence_threshold = 30
+    confidence_threshold = 8
     # Load the target image
     target = cv2.imread('screenshot_scan.png', 0)
 
@@ -232,7 +234,7 @@ def train_data_out_other():
     file = input("language list file name(spanish file) = ")
     recognized_text = pytesseract.image_to_string('screenshot.png')
     lines_list = [line for line in recognized_text.splitlines() if line.strip()]
-    f = open(file + '.txt', 'w')
+    f = open('trained_models/' + file + '.txt', 'w')
     
     for i in lines_list:
         f.write("\n")
@@ -245,7 +247,7 @@ def train_data_out_english():
     language = []
     recognized_text = pytesseract.image_to_string('screenshot.png')
     lines_list = [line for line in recognized_text.splitlines() if line.strip()]
-    f = open(file + '.txt', 'w')
+    f = open('trained_models/' + file + '.txt', 'w')
     
     for i in lines_list:
         f.write("\n")
@@ -259,7 +261,7 @@ def train():
     global spanish
     global english
     file = input("language list file(spanish file) = ")
-    f = open(file + '.txt', 'r')
+    f = open('trained_models/' + file + '.txt', 'r')
     spanish = []
     for l in f:
         if ";" in l:
@@ -273,7 +275,7 @@ def train():
     f.close()
     
     file = input("language list file(english file) = ")
-    f = open(file + '.txt', 'r')
+    f = open('trained_models/' + file + '.txt', 'r')
     english = []
     for l in f:
         if ";" in l:
@@ -362,7 +364,7 @@ while True:
         times = int(input('how many times: '))
         #checking = input('would you like error checking(uses cpu resources!)(Y/N): ')
         thread1 = threading.Thread(target=num3)
-        thread1.start()
+        #thread1.start()
         for i in range(times):
             error = False
             
@@ -419,9 +421,6 @@ while True:
                     # Step 3: Capture the screenshot
                 screenshot = 'screenshot.png'#ImageGrab.grab()
 
-
-                # Step 4: Preprocess the screenshot (optional)
-
                 # Step 5: Perform text recognition
                 recognized_text = pytesseract.image_to_string(screenshot)
 
@@ -429,19 +428,27 @@ while True:
                 #print(recognized_text)
                 recognized_text = recognized_text.rstrip()
                     
-                if "," in recognized_text:
-                    parts = recognized_text.split(",", 1)
-                    result = parts[0]
-                        
-                else:
-                    result = recognized_text
-                        
-                if recognized_text == 'ice cream, ice-cream':
-                    sys.exit
+                result = recognized_text
+                
+                if '|' in result:
+                    result = result.replace('|', 'I')
                     
+                if 'Translate from English to Spanish' in result:
+                    result = result.replace('Translate from English to Spanish', "")
+                    
+                if 'Translate from Spanish to English' in result:
+                    result = result.replace('Translate from Spanish to English', "")
+                    
+                if 'Translate from French to English' in result:
+                    result = result.replace('Translate from French to English', "")
+                    
+                if 'Translate from English to French' in result:
+                    result = result.replace('Translate from English to French', "")
+                        
+                print(recognized_text)
                 if read_write.lower() == 'r':
-                    closest_word = find_closest_match(result.lower(), spanish)
-                    #print("Closest match for '{}' is '{}'.".format(result, closest_word))
+                    closest_word = find_closest_match(result, spanish)
+                    print("Closest match for '{}' is '{}'.".format(result, closest_word))
                     i = spanish.index(closest_word)
                     i -= 1
                     x = language_list[i]
@@ -449,8 +456,8 @@ while True:
                     to_type = x[1]
                         
                 elif read_write.lower() == 'w':
-                    closest_word = find_closest_match(result.lower(), english)
-                    #print("Closest match for '{}' is '{}'.".format(result, closest_word))
+                    closest_word = find_closest_match(result, english)
+                    print("Closest match for '{}' is '{}'.".format(result, closest_word))
                     i = english.index(closest_word)
                     i -= 1
                     x = language_list[i]
@@ -461,12 +468,28 @@ while True:
                 pyautogui.moveTo(float(config.get('cerse', 'x')),float(config.get('cerse', 'y')), duration=0.01)
 
                 pyautogui.click()
+                
+                if "?1" in to_type:
+                    pyperclip.copy('¿')
+                    pyautogui.hotkey('ctrl', 'v')
+                    to_type = to_type.replace('?1', "")
+                    
+                if "!1" in to_type:
+                    pyperclip.copy('¡')
+                    pyautogui.hotkey('ctrl', 'v')
+                    to_type = to_type.replace('!1', "")
 
-                pyautogui.typewrite(to_type, interval=0.01)
-                            
-                if to_type == '':
-                    pyautogui.typewrite('?', interval=0.01)
-                    pyautogui.press('enter')
+                specical1 = [['n1', 'ñ'], ['a1', 'á'], ['e1', 'é'], ['i1', 'í'], ['o1', 'ó'], ['u1', 'ú']]
+                
+                for i in specical1:
+                    if i[0] in to_type:
+                        to_type = to_type.replace(i[0], i[1])
+                        
+                print('=================to type=================')
+                print(to_type)
+
+                pyperclip.copy(to_type)
+                pyautogui.hotkey('ctrl', 'v')
 
                 # Simulate pressing the "Enter" key
                 pyautogui.press('enter')
