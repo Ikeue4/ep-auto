@@ -1,0 +1,10 @@
+^C:\GITHUB\EP-AUTO\OTOV3\BUILD\CMAKEFILES\2E3B6E13B67C81592314229AB596ADED\GENERATE.STAMP.RULE
+setlocal
+"C:\Program Files\CMake\bin\cmake.exe" -SC:/GitHub/ep-auto/OTOV3 -BC:/GitHub/ep-auto/OTOV3/build --check-stamp-list CMakeFiles/generate.stamp.list --vs-solution-file C:/GitHub/ep-auto/OTOV3/build/CV2.sln
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal & call :cmErrorLevel %errorlevel% & goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd

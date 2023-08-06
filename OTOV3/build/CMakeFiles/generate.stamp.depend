@@ -1,0 +1,33 @@
+# CMake generation dependency list for this directory.
+C:/GitHub/ep-auto/OTOV3/CMakeLists.txt
+C:/GitHub/ep-auto/OTOV3/build/CMakeFiles/3.27.1/CMakeCCompiler.cmake
+C:/GitHub/ep-auto/OTOV3/build/CMakeFiles/3.27.1/CMakeCXXCompiler.cmake
+C:/GitHub/ep-auto/OTOV3/build/CMakeFiles/3.27.1/CMakeRCCompiler.cmake
+C:/GitHub/ep-auto/OTOV3/build/CMakeFiles/3.27.1/CMakeSystem.cmake
+C:/Program Files/CMake/share/cmake-3.27/Modules/CMakeCInformation.cmake
+C:/Program Files/CMake/share/cmake-3.27/Modules/CMakeCXXInformation.cmake
+C:/Program Files/CMake/share/cmake-3.27/Modules/CMakeCommonLanguageInclude.cmake
+C:/Program Files/CMake/share/cmake-3.27/Modules/CMakeGenericSystem.cmake
+C:/Program Files/CMake/share/cmake-3.27/Modules/CMakeInitializeConfigs.cmake
+C:/Program Files/CMake/share/cmake-3.27/Modules/CMakeLanguageInformation.cmake
+C:/Program Files/CMake/share/cmake-3.27/Modules/CMakeRCInformation.cmake
+C:/Program Files/CMake/share/cmake-3.27/Modules/CMakeSystemSpecificInformation.cmake
+C:/Program Files/CMake/share/cmake-3.27/Modules/CMakeSystemSpecificInitialize.cmake
+C:/Program Files/CMake/share/cmake-3.27/Modules/Compiler/CMakeCommonCompilerMacros.cmake
+C:/Program Files/CMake/share/cmake-3.27/Modules/Compiler/MSVC-C.cmake
+C:/Program Files/CMake/share/cmake-3.27/Modules/Compiler/MSVC-CXX.cmake
+C:/Program Files/CMake/share/cmake-3.27/Modules/Compiler/MSVC.cmake
+C:/Program Files/CMake/share/cmake-3.27/Modules/FindPackageHandleStandardArgs.cmake
+C:/Program Files/CMake/share/cmake-3.27/Modules/FindPackageMessage.cmake
+C:/Program Files/CMake/share/cmake-3.27/Modules/Platform/Windows-Initialize.cmake
+C:/Program Files/CMake/share/cmake-3.27/Modules/Platform/Windows-MSVC-C.cmake
+C:/Program Files/CMake/share/cmake-3.27/Modules/Platform/Windows-MSVC-CXX.cmake
+C:/Program Files/CMake/share/cmake-3.27/Modules/Platform/Windows-MSVC.cmake
+C:/Program Files/CMake/share/cmake-3.27/Modules/Platform/Windows.cmake
+C:/Program Files/CMake/share/cmake-3.27/Modules/Platform/WindowsPaths.cmake
+C:/Users/alexa/opencv/build/OpenCVConfig-version.cmake
+C:/Users/alexa/opencv/build/OpenCVConfig.cmake
+C:/Users/alexa/opencv/build/x64/vc16/lib/OpenCVConfig.cmake
+C:/Users/alexa/opencv/build/x64/vc16/lib/OpenCVModules-debug.cmake
+C:/Users/alexa/opencv/build/x64/vc16/lib/OpenCVModules-release.cmake
+C:/Users/alexa/opencv/build/x64/vc16/lib/OpenCVModules.cmake

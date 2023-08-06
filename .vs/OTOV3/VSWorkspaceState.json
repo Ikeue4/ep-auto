@@ -1,0 +1,8 @@
+{
+  "OutputFoldersPerTargetSystem": {
+    "Local Machine": [
+      "OTOV3\\out\\build\\x64-Debug",
+      "OTOV3\\out\\install\\x64-Debug"
+    ]
+  }
+}
