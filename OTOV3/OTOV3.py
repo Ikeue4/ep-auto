@@ -13,6 +13,7 @@ import cv2
 import numpy as np
 import psutil
 import pyperclip
+import queue
 
 tessdata_path = os.path.join(os.path.dirname(__file__), 'tessdata')
 os.environ['TESSDATA_PREFIX'] = tessdata_path
@@ -310,7 +311,30 @@ def train():
         
     for i in language_list:
         print(i)
+        
+def process_template_scores(scores,output_queue):
+    changed = True
+    global stop
+    
+    template_x_1 = config.get('screenshot_score', 'sx1')
+    template_x_2 = config.get('screenshot_score', 'sx2')
+    template_y_1 = config.get('screenshot_score', 'sy1')
+    template_y_2 = config.get('screenshot_score', 'sy2')
+        
+    screenshot = pyautogui.screenshot(region=(float(template_x_1), float(template_y_1), float(template_x_2) - float(template_x_1), float(template_y_2) - float(template_y_1)))
+    screenshot.save("screenshot_score.png")
+    
+    recognized_text = pytesseract.image_to_string(screenshot, lang='eng')
+    recognized_text = recognized_text.rstrip()
+    
+    length = len(scores) - 1
+    if length > 30:
+        if recognized_text == scores[length - 28]:
+            changed = False
+    if changed == False:
+        stop = True
 
+    output_queue.put(recognized_text)
 def t1():
     total_iterations = 10
     for i in range(total_iterations + 1):
@@ -337,28 +361,43 @@ while True:
     clear_terminal()
     
     if main_menu_input == "1":
-        clicks = 0
-        x1 = 0
-        x2 = 0
-        y1 = 0
-        y2 = 0
-        screenshot_position()
-        print(x1, y1)
-        print(x2, y2)
-        screenshot_with_new(x1, y1, x2, y2)
-        train_data_out_other()
-        clicks = 0
-        x1 = 0
-        x2 = 0
-        y1 = 0
-        y2 = 0
-        screenshot_position()
-        print(x1, y1)
-        print(x2, y2)
-        screenshot_with_new(x1, y1, x2, y2)
-        train_data_out_english()
-        language_list = []
-        
+        auto_train = input('Auto-Train(Y/N): ')
+        if auto_train.lower() == 'n':
+            clicks = 0
+            x1 = 0
+            x2 = 0
+            y1 = 0
+            y2 = 0
+            screenshot_position()
+            print(x1, y1)
+            print(x2, y2)
+            screenshot_with_new(x1, y1, x2, y2)
+            train_data_out_other()
+            clicks = 0
+            x1 = 0
+            x2 = 0
+            y1 = 0
+            y2 = 0
+            screenshot_position()
+            print(x1, y1)
+            print(x2, y2)
+            screenshot_with_new(x1, y1, x2, y2)
+            train_data_out_english()
+            language_list = []
+        elif auto_train.lower() == 'y':
+            x1 = config.get('screenshot_auto', 'ox1')
+            x2 = config.get('screenshot_auto', 'ox2')
+            y1 = config.get('screenshot_auto', 'oy1')
+            y2 = config.get('screenshot_auto', 'oy2')
+            screenshot_with_new(float(x1), float(y1), float(x2), float(y2))
+            train_data_out_other()
+            x1 = config.get('screenshot_auto', 'sx1')
+            x2 = config.get('screenshot_auto', 'sx2')
+            y1 = config.get('screenshot_auto', 'sy1')
+            y2 = config.get('screenshot_auto', 'sy2')
+            screenshot_with_new(float(x1), float(y1), float(x2), float(y2))
+            
+            train_data_out_english()
     elif main_menu_input == "2":
         clear_terminal()
         read_write = input('R for Read, W for Write: ')
@@ -368,11 +407,15 @@ while True:
         stop = False
         errors = 0
         stop_flag = False
+        scores = []
         times = int(input('how many times: '))
         #checking = input('would you like error checking(uses cpu resources!)(Y/N): ')
         thread1 = threading.Thread(target=num3)
         #thread1.start()
+        output_queue = queue.Queue()
+        times_done = 0
         for i in range(times):
+            start_time_cpu = time.time()
             error = False
             
             generate_image()
@@ -384,14 +427,19 @@ while True:
             thread2 = threading.Thread(target=process_template, args=(template_file1,))
             thread3 = threading.Thread(target=process_template_error, args=(template_file2,))
             thread4 = threading.Thread(target=process_template, args=(template_file3,))
+            thread5 = threading.Thread(target=process_template_scores, args=(scores,output_queue))
             
             thread2.start()
             thread3.start()
             thread4.start()
+            thread5.start()
             
             thread2.join()
             thread3.join()
             thread4.join()
+            thread5.join()
+            
+            scores.append(output_queue.get())
             
             if stop == True:
                 break
@@ -479,7 +527,9 @@ while True:
                 pyautogui.moveTo(float(config.get('cerse', 'x')),float(config.get('cerse', 'y')), duration=0.01)
 
                 pyautogui.click()
-    
+
+                if 'ï¿½' in to_type:
+                    to_type = to_type.replace('ï¿½', "í")
                         
                 print('=================to type=================')
                 print(to_type)
@@ -492,12 +542,18 @@ while True:
             else:
                 time.sleep(2)
                 pyautogui.press('enter')
+            times_done += 1
+            end_time_cpu = time.time()
+            execution_time_cpu = end_time_cpu - start_time_cpu
+            print(f"CPU Execution Time: {execution_time_cpu:.4f} seconds")
+            print("errors:", errors)
+            print(str(times_done)+"/"+str(times))
         stop_flag = True
         clear_terminal()
         
     elif main_menu_input == '3':
         clear_terminal()
-        print('1. screenshot scan area calibration\n2. cerise scan area calibration\n')
+        print('1. screenshot scan area calibration\n2. cerise scan area calibration\n3. auto train scan area calibration\n4. score checking calibration')
         settings_menu_input = input("")
         if settings_menu_input == "1":
             clear_terminal()
@@ -538,6 +594,51 @@ while True:
                 if conferm.lower() == 'y':
                     with open('config.ini', 'w') as configfile:
                         config.write(configfile)
+        elif settings_menu_input == '3':
+            clear_terminal()
+            change = input("change values(Y/N): ")
+            print('tab to ep!!!!!(first is other language)')
+            time.sleep(2)
+            clicks = 0
+            screenshot_position()
+            config.set('screenshot_auto', 'ox1', str(x1))
+            config.set('screenshot_auto', 'ox2', str(x2))
+            config.set('screenshot_auto', 'oy1', str(y1))
+            config.set('screenshot_auto', 'oy2', str(y2))
+            print('conform first part')
+            conferm = input('')
+            if conferm.lower() == 'y':
+                with open('config.ini', 'w') as configfile:
+                    config.write(configfile)
+            clicks = 0
+            time.sleep(0.5)
+            screenshot_position()
+            config.set('screenshot_auto', 'sx1', str(x1))
+            config.set('screenshot_auto', 'sx2', str(x2))
+            config.set('screenshot_auto', 'sy1', str(y1))
+            config.set('screenshot_auto', 'sy2', str(y2))
+            print('conform second part')
+            conferm = input('')
+            if conferm.lower() == 'y':
+                with open('config.ini', 'w') as configfile:
+                    config.write(configfile)
+        elif settings_menu_input == '4':
+            clear_terminal()
+            change = input("change values(Y/N): ")
+            print('tab to ep!!!!!(first is other language)')
+            time.sleep(2)
+            clicks = 0
+            screenshot_position()
+            config.set('screenshot_score', 'sx1', str(x1))
+            config.set('screenshot_score', 'sx2', str(x2))
+            config.set('screenshot_score', 'sy1', str(y1))
+            config.set('screenshot_score', 'sy2', str(y2))
+            print('conferm')
+            conferm = input()
+            if conferm.lower() == 'y':
+                with open('config.ini', 'w') as configfile:
+                    config.write(configfile)
+            
     
     elif main_menu_input == '4':
         clear_terminal()

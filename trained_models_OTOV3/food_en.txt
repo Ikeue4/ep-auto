@@ -1,0 +1,16 @@
+
+fruit; the fruit
+milk; the milk
+bread; the bread
+cake; the cake
+cheese; the cheese
+chips; fries; french fries; the chips; the fries
+vegetables; the vegetables
+chocolate; the chocolate
+fish; the fish
+the chicken
+I like it
+ice cream; ice-cream
+I don't like it
+biscuits
+rice
