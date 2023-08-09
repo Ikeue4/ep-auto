@@ -543,11 +543,13 @@ while True:
                 time.sleep(2)
                 pyautogui.press('enter')
             times_done += 1
+            length = len(scores) - 1
             end_time_cpu = time.time()
             execution_time_cpu = end_time_cpu - start_time_cpu
             print(f"CPU Execution Time: {execution_time_cpu:.4f} seconds")
             print("errors:", errors)
             print(str(times_done)+"/"+str(times))
+            print("user score:", scores[length])
         stop_flag = True
         clear_terminal()
         
