@@ -1,0 +1,21 @@
+
+kitchen
+How many rooms does it have?
+shower; the shower
+toilet
+dining room; the dining room
+bathroom; the bathroom
+office
+bedroom; the bedroom
+garage; the garage
+garden; the garden
+corridor
+the living room
+lounge-diner
+stairs
+The rooms
+there is
+swimming pool
+terrace; the terrace
+It has five rooms
+a view of the sea

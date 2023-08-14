@@ -1,21 +1,6 @@
-import pytesseract
-from PIL import ImageGrab
-import pyautogui
-import time
-import sys
 import os
-import matplotlib.pyplot as plt
-import matplotlib.image as mpimg
-import Levenshtein
-import threading
 import configparser
-import cv2
-import numpy as np
-import psutil
-import pyperclip
-import queue
 from datetime import datetime
-
 
 def set_data_persistent(name, errors, times):
     data_path = os.path.join(os.path.dirname(__file__), 'data.ini')
@@ -69,7 +54,3 @@ def get_data_persistent(name):
     difference_in_days = difference.days
     
     return difference_in_days, percentage
-            
-
-set_data_persistent('ser', 3, 50)
-print(get_data_persistent('ser'))

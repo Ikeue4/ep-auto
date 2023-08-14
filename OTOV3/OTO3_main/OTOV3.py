@@ -1,5 +1,5 @@
 import pytesseract
-from PIL import ImageGrab
+from datetime import datetime
 import pyautogui
 import time
 import sys
@@ -14,9 +14,7 @@ import numpy as np
 import psutil
 import pyperclip
 import queue
-
-tessdata_path = os.path.join(os.path.dirname(__file__), 'tessdata')
-os.environ['TESSDATA_PREFIX'] = tessdata_path
+from OTO import OTO_learning
 
 config = configparser.ConfigParser()
 config.read('config.ini')
@@ -335,6 +333,9 @@ def process_template_scores(scores,output_queue):
         stop = True
 
     output_queue.put(recognized_text)
+    
+
+
 def t1():
     total_iterations = 10
     for i in range(total_iterations + 1):
@@ -344,14 +345,23 @@ def t1():
 def t2():
     pytesseract.pytesseract.tesseract_cmd = r'C:\Program Files\Tesseract-OCR\tesseract.exe'
     
+def t3():
+    tessdata_path = os.path.join(os.path.dirname(__file__), 'tessdata')
+    print(tessdata_path)
+    os.environ['TESSDATA_PREFIX'] = tessdata_path
+
+    
 thread1 = threading.Thread(target=t1)
 thread2 = threading.Thread(target=t2)
+thread3 = threading.Thread(target=t3)
 
 thread1.start()
 thread2.start()
+thread3.start()
 
 thread1.join()
-thread1.join()
+thread2.join()
+thread3.join()
     
 
 while True:
@@ -415,6 +425,7 @@ while True:
         output_queue = queue.Queue()
         times_done = 0
         for i in range(times):
+            time.sleep(0.1)
             start_time_cpu = time.time()
             error = False
             
@@ -502,17 +513,22 @@ while True:
                     
                 if 'Translate from English to French' in result:
                     result = result.replace('Translate from English to French', "")
+                
+                result = result.rstrip()
                         
                 print(recognized_text)
                 if read_write.lower() == 'r':
                     closest_word = find_closest_match(result, spanish)
                     print("Closest match for '{}' is '{}'.".format(result, closest_word))
                     print(spanish)
-                    i = spanish.index(closest_word)
-                    i -= 1
-                    x = language_list[i]
-                    #print(x[1])
-                    to_type = x[1]
+                    if closest_word == '?':
+                        to_type = 'error'
+                    else:
+                        i = spanish.index(closest_word)
+                        i -= 1
+                        x = language_list[i]
+                        #print(x[1])
+                        to_type = x[1]
                         
                 elif read_write.lower() == 'w':
                     closest_word = find_closest_match(result, english)
@@ -640,9 +656,51 @@ while True:
             if conferm.lower() == 'y':
                 with open('config.ini', 'w') as configfile:
                     config.write(configfile)
-            
+        elif settings_menu_input == '5':
+            clear_terminal()
+            change = input("change values(Y/N): ")
+            print('tab to ep!!!!!(first is other language)')
+            time.sleep(2)
+            clicks = 0
+            screenshot_position()
+            config.set('tasks', 'x11', str(x1))
+            config.set('tasks', 'x12', str(x2))
+            config.set('tasks', 'y11', str(y1))
+            config.set('tasks', 'y12', str(y2))
+            clicks = 0
+            time.sleep(0.5)
+            screenshot_position()
+            config.set('tasks', 'x21', str(x1))
+            config.set('tasks', 'x22', str(x2))
+            config.set('tasks', 'y21', str(y1))
+            config.set('tasks', 'y22', str(y2))
+            clicks = 0
+            time.sleep(0.5)
+            screenshot_position()
+            config.set('tasks', 'x31', str(x1))
+            config.set('tasks', 'x32', str(x2))
+            config.set('tasks', 'y31', str(y1))
+            config.set('tasks', 'y32', str(y2))
+            clicks = 0
+            time.sleep(0.5)
+            screenshot_position()         
+            config.set('tasks', 'x41', str(x1))
+            config.set('tasks', 'x42', str(x2))
+            config.set('tasks', 'y41', str(y1))
+            config.set('tasks', 'y42', str(y2))
+            print('conferm')
+            conferm = input()
+            if conferm.lower() == 'y':
+                with open('config.ini', 'w') as configfile:
+                    config.write(configfile)
     
     elif main_menu_input == '4':
         clear_terminal()
         sys.exit()
-            
+        
+    elif main_menu_input == '5':
+        conferm = input('full auto mode active!!!!!! continue Y')
+        if conferm.lower() != 'y':
+            sys.exit()
+        
+        

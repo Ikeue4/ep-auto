@@ -1,33 +1,18 @@
 def read_OTO(file_path):
-    lines = {}
-    with open(file_path, 'r') as file:
+    lines_un = {}
+    lines_link = {}
+    with open(file_path, 'r', encoding="utf-16") as file:
         for line in file:
-            line_data = line.strip().split(':')
+            line_data = line.strip().split('⑄')
             line_id, content, linked_line_id = line_data
-            lines[line_id] = (content, linked_line_id)
-    return lines
+            lines_un[line_id] = (content, linked_line_id)
+            lines_link[line_id] = 
+    return lines_un
 
 def write_OTO(file_path, lines_data):
-    with open(file_path, 'w') as file:
+    with open(file_path, 'w', encoding="utf-16") as file:
         for line_id, (content, linked_line_id) in lines_data.items():
-            file.write(f"{line_id}:{content}:{linked_line_id}\n")
-            
-def link_read_OTO(file_path):
-    with open(file_path, 'r') as file:
-        line_mapping = {}
-        for line in file:
-            line = line.rstrip()
-
-            parts = line.split(':')
-            line_num = int(parts[0][4:])
-            text = parts[1]
-            linked_line_num = int(parts[2][4:])
-            line_mapping[line_num] = (text, linked_line_num)
-
-            for line_num, (text, linked_line_num) in line_mapping.items():
-                linked_text, _ = line_mapping[linked_line_num]
-                link = f'<a href="#line{linked_line_num}">{linked_text}</a>'
-                print(f'line{line_num}:{text}:{link}')
+            file.write(f"{line_id}⑄{content}⑄{linked_line_id}\n")
 
 # Example usage:
 file_path = 'OTOV3/custom_file.OTO'
@@ -39,5 +24,5 @@ lines_data = {
     'line5': ('This is line five', 'line2'),
     'line6': ('This is line six', 'line3'),
 }
-
-link_read_OTO(file_path)
+write_OTO(file_path, lines_data)
+print(read_OTO(file_path))

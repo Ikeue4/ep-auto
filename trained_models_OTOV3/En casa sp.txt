@@ -1,0 +1,21 @@
+
+la cocina
+¿Cuántas habitaciones tiene?
+la ducha
+el aseo
+el comedor
+el cuarto de baño
+el despacho
+el dormitorio
+el garaje
+el jardín
+el pasillo
+el salón
+el salón-comedor
+la escalera
+Las habitaciones
+hay
+la piscina
+la terraza
+Tiene cinco habitaciones
+una vista al mar
