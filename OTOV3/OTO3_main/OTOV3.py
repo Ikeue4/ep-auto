@@ -15,6 +15,26 @@ import psutil
 import pyperclip
 import queue
 from OTO import OTO_learning
+import requests
+import socket
+
+s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+s.connect(("8.8.8.8", 80))
+print(s.getsockname()[0])
+ip = (s.getsockname()[0])
+s.close()
+key = 'ygauihdgwga123125sjhd213'
+
+data = {
+    'ip': ip,
+    'key': key
+}
+
+out = requests.post('https://auto-ep-server-1.poeple.repl.co/val', json=data)
+print(out.text)
+
+if out.text != '200':
+    raise SyntaxWarning
 
 config = configparser.ConfigParser()
 config.read('config.ini')

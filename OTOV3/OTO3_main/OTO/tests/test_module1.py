@@ -1,12 +1,19 @@
 def read_OTO(file_path):
     lines_un = {}
     lines_link = {}
+    content_list = []
+    line_list = []
+    linked_line_list = []
     with open(file_path, 'r', encoding="utf-16") as file:
         for line in file:
             line_data = line.strip().split('⑄')
             line_id, content, linked_line_id = line_data
             lines_un[line_id] = (content, linked_line_id)
-            lines_link[line_id] = 
+            content_list.append(content)
+            line_list.append(line_list)
+            linked_line_list.append(linked_line_id)
+
+
     return lines_un
 
 def write_OTO(file_path, lines_data):
