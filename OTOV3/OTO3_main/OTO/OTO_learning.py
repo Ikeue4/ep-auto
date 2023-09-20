@@ -29,6 +29,7 @@ def set_data_persistent(name, errors, times):
         data.set(name, 'day', str(currentDay))
         data.set(name, 'month', str(currentMonth))
         data.set(name, 'year', str(currentYear))
+        data.set(name, 'accuracy', str(percentage))
         with open(data_path, 'w') as dataf:
             data.write(dataf)
             
@@ -53,4 +54,13 @@ def get_data_persistent(name):
     
     difference_in_days = difference.days
     
-    return difference_in_days, percentage
+    return name, difference_in_days, percentage
+
+def get_day_point_possibilities(data_in):
+    data_in.sort()
+    best = len(data_in) - 1
+    i = data_in[best]
+    if float(i[2]) < 90:
+        data_in.pop(best)
+    else:
+        return i[0]

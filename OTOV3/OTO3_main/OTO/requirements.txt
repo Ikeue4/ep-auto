@@ -1,0 +1,15 @@
+pytesseract==0.3.8
+datetime
+pyautogui
+matplotlib==3.4.3
+python-Levenshtein
+configparser
+opencv-python-headless
+numpy
+psutil
+pyperclip
+requests
+socketIO-client
+translate
+fuzzywuzzy
+nltk
