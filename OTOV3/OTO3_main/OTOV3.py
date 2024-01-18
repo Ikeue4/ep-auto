@@ -24,25 +24,6 @@ from nltk.corpus import wordnet
 
 OTO.setup()
 
-s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-s.connect(("8.8.8.8", 80))
-print(s.getsockname()[0])
-ip = (s.getsockname()[0])
-s.close()
-key = 'ygauihdgwga123125sjhd213'
-
-data = {
-    'ip': ip,
-    'key': key
-}
-
-#out = requests.post('https://auto-ep-server-1.poeple.repl.co/val', json=data)
-#print(out.text)
-
-#if out.text != '200':
-    #raise SyntaxWarning
-#time.sleep(1)
-
 config = configparser.ConfigParser()
 config.read('config.ini')
 x1 = 0
